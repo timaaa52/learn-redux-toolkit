@@ -1,15 +1,15 @@
 import React from 'react'
 import { useAppDispatch } from '../hooks/hooks';
-import { TaskAction } from '../store/slices/TaskSlice';
+import { addNewTask, TaskAction } from '../store/slices/TaskSlice';
 
 
 export const AddItemForm: React.FC = () => {
 
-    const [title, setTitle] = React.useState('');
+    const [title, setTitle] = React.useState<string>('');
     const dispatch = useAppDispatch();
     
     const addTaskHandler = () => {
-        dispatch(TaskAction.addTask(title))
+        dispatch(addNewTask(title))
         setTitle('')
     }
 
