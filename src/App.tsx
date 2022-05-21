@@ -1,7 +1,7 @@
 import { AddItemForm } from "./components/AddItemForm";
 import { Task } from "./components/Task";
 import { useAppDispatch, useAppSelector } from "./hooks/hooks";
-import { fetchTasks, removeTaskT, TaskAction } from "./store/slices/TaskSlice";
+import {fetchTasks, removeTaskT, TaskAction, updateTask} from "./store/slices/TaskSlice";
 import "./App.css";
 import { useEffect } from "react";
 
@@ -14,11 +14,11 @@ export const App = () => {
     dispatch(fetchTasks())
   }, [dispatch])
    
-  const changeTaskStatus = (id: string, status: boolean) => {
-    dispatch(TaskAction.changeTaskStatus({id, status}))
+  const changeTaskStatus = (id: number, status: boolean) => {
+    dispatch(updateTask({id, status}))
   };
 
-  const removeTask = (id: string) => {
+  const removeTask = (id: number) => {
     dispatch(removeTaskT(id));
   };
 
@@ -37,7 +37,7 @@ export const App = () => {
             <Task
               key={t.id}
               id={t.id}
-              status={t.status}
+              status={t.completed}
               title={t.title}
               changeStatus={changeTaskStatus}
               removeTask={removeTask}
