@@ -4,9 +4,9 @@ import { ChangeEvent } from "react";
 interface TaskPropTypes {
   title: string;
   status: boolean;
-  id: string;
-  changeStatus: (id: string, status: boolean) => void;
-  removeTask: (id: string) => void;
+  id: number;
+  changeStatus: (id: number, status: boolean) => void;
+  removeTask: (id: number) => void;
 }
 
 export const Task: React.FC<TaskPropTypes> = ({
@@ -17,10 +17,8 @@ export const Task: React.FC<TaskPropTypes> = ({
   removeTask,
 }) => {
 
-  const [statuss, setStatus] = React.useState(false)
 
   const changeStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setStatus(!statuss)
     changeStatus(id, e.currentTarget.checked);
     
   };
@@ -31,8 +29,8 @@ export const Task: React.FC<TaskPropTypes> = ({
 
   return (
     <div>
-      <input type="checkbox" checked={statuss} onChange={changeStatusHandler} />
-      <span style={{marginRight: '5px'}} className={statuss ? 'completed' : ''}>{title}</span>
+      <input type="checkbox" checked={status} onChange={changeStatusHandler} />
+      <span style={{marginRight: '5px'}} className={status ? 'completed' : ''}>{title}</span>
       <span 
         onClick={removeTaskHandler}
         style={{cursor: 'pointer'}}
