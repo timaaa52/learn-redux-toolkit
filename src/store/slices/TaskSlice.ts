@@ -1,10 +1,12 @@
 import { createAsyncThunk, createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit"
+import {AppRootStateType} from "../store";
 
 type TaskStateType = {
     tasks: Array<{
-        id: string
+        id: number
         title: string
-        status: boolean
+        completed: boolean
+        userId: number
     }>
     isLoading: boolean
 }
@@ -20,13 +22,13 @@ export const TaskSlice = createSlice({
     initialState,
     reducers: {
         addTask: (state, action: PayloadAction<{text: string}>) => {
-            state.tasks.unshift({ id: nanoid(), title: action.payload.text, status: false })
+            state.tasks.unshift({ id: Number(nanoid()), title: action.payload.text, completed: false, userId: Number(nanoid()) })
         },
-        removeTask: (state, action: PayloadAction<{id: string}>) => {
+        removeTask: (state, action: PayloadAction<{id: number}>) => {
            state.tasks = state.tasks.filter((t) => t.id !== action.payload.id)
         },
-        changeTaskStatus: (state, action: PayloadAction<{id: string, status: boolean}>) => {
-            state.tasks = state.tasks.map(t => t.id === action.payload.id ? {...t, status: action.payload.status} : t)
+        changeTaskStatus: (state, action: PayloadAction<{id: number, status: boolean}>) => {
+            state.tasks = state.tasks.map(t => t.id === action.payload.id ? {...t, completed: action.payload.status} : t)
         }
     },
     extraReducers: (builder) => {
@@ -63,21 +65,43 @@ export const addNewTask = createAsyncThunk(
                'Content-Type': 'application/json'
            }
        })
-       console.log(response)
-       
        dispatch(TaskAction.addTask({text}))
    }
 )
 export const removeTaskT = createAsyncThunk(
     'tasks/removeTask', 
-    async (id: string, {dispatch}) => {
+    async (id: number, {dispatch}) => {
         const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
             method: 'DELETE'
         })
-        console.log(response);
-        
         dispatch(TaskAction.removeTask({id}))
     }
-) 
+)
+
+export const updateTask = createAsyncThunk(
+    'tasks/updateTask',
+    async (value: {id: number, status: boolean}, {dispatch, getState}) => {
+        const { tasks } = (getState() as AppRootStateType).tasks
+        const currentTask = tasks.find(t => t.id === value.id)
+        if(!currentTask){
+            console.warn('ERROR')
+            return
+        }
+        const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${value.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                id: currentTask.id,
+                completed: value.status,
+                title: currentTask.title,
+                userId: currentTask.userId
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        dispatch(TaskAction.changeTaskStatus(value))
+    }
+)
+
 export const TaskReducer = TaskSlice.reducer;
 export const TaskAction = TaskSlice.actions;
